@@ -1,1 +1,2 @@
-GET     /                           controllers.HomeController.index
+GET     /                           controllers.MongoController.listAllofThem
+POST    /newThreat                  controllers.MongoController.addNewThreat

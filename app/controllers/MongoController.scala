@@ -6,9 +6,13 @@ import play.api.libs.json._
 
 
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
+class MongoController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
   def index = Action {
+    Ok("xD")
+  }
+
+  def listAllofThem = Action {
 
     val json: JsValue = JsObject(Seq(
       "tak" -> JsString("bylo")
@@ -16,5 +20,12 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
     Ok(json)
   }
+
+  def addNewThreat() = Action {
+
+    Ok("dupa")
+  }
+
+
 
 }

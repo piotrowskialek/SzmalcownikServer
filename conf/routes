@@ -1,2 +1,2 @@
-GET     /                           controllers.MainController.listAllofThem
-POST    /newThreat                  controllers.MainController.addNewThreat
+GET     /                           controllers.MainController.index
+POST    /newThreat                  controllers.MainController.post

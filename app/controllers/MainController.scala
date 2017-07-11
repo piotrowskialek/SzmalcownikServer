@@ -2,21 +2,16 @@ package controllers
 
 import javax.inject.Inject
 
+import models.Threat
 import play.api.i18n.MessagesApi
-import play.api.libs.json.{JsObject, JsString, JsValue}
-import play.api.mvc.{Action, AnyContent, Controller}
-import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
-
-import play.api.Logger
-import play.api.mvc.{ Action, Controller }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
-
-
-import reactivemongo.play.json.collection.JSONCollection
-import models._
-
+import play.api.mvc.{Action, Controller}
+import play.modules.reactivemongo.json.collection.JSONCollection
+import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import reactivemongo.api.Cursor
+import reactivemongo.api.collections.bson.BSONCollection
+import reactivemongo.bson.BSONDocument
 
 import scala.concurrent.Future
 
@@ -26,45 +21,27 @@ class MainController @Inject()(val messagesApi: MessagesApi,
                                implicit val materializer: akka.stream.Materializer)
   extends Controller with MongoController with ReactiveMongoComponents {
 
-  def collection: JSONCollection = db.collection[JSONCollection]("threats")
+  import models.Threat.threatJsonFormat
 
-  def create: Action[AnyContent] = Action.async {
-    val user = Threat(1, 1.0, 1.0, 123456789)
-    val futureResult = collection.insert(user)
-    futureResult.map(_ => Ok)
-  }
+  def collection2: JSONCollection = db.collection[JSONCollection]("threats")
+  def collection: BSONCollection = db[BSONCollection]("threats")
 
-
-  def createFromJson: Action[JsValue] = Action.async(parse.json) { request =>
-
-    request.body.validate[Threat].map { threat =>
-      collection.insert(threat).map { lastError =>
-        Logger.debug(s"Successfully inserted with LastError: $lastError")
-        Created
-      }
-    }.getOrElse(Future.successful(BadRequest("invalid json")))
-  }
-
-  def findByName(id: Int): Action[AnyContent] = Action.async {
-
-    val cursor: Cursor[Threat] = collection.
-      find(Json.obj("id" -> id)).
-      sort(Json.obj("created" -> -1)).
-      cursor[Threat]
-
-    val futureUsersList: Future[List[Threat]] = cursor.collect[List]()
-
-    futureUsersList.map { persons =>
-      Ok(persons.toString)
-    }
-  }
 
 
   def index = Action {
 
+    import models.Threat.threatJsonFormat
+
+    val dto = Threat(1,1.0,1.0,123)
+
+    collection2.insert(dto)
+
+    val query = BSONDocument()
+    val cursor: Cursor[BSONDocument] = collection.find(query).cursor[BSONDocument]
+    val futureList: Future[List[BSONDocument]] = cursor.collect[List]()
 
     val json: JsValue = JsObject(Seq(
-      "tak" -> JsString("bylo")
+    "tak" -> JsString("bylo")
     ))
 
     Ok(json)

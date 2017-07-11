@@ -12,7 +12,7 @@ case class Threat(
   created: Long
 )
 
-object JsonFormats {
-  implicit val threatFormat: OFormat[Threat] = Json.format[Threat]
+object Threat {
+  implicit val threatJsonFormat: OFormat[Threat] = Json.format[Threat]
 }
 
